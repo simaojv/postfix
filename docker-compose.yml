@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: postfixadmin
+      MYSQL_USER: postfixadmin
+      MYSQL_PASSWORD: example
+
+  postfixadmin:
+    depends_on:
+      - db
+    image: postfixadmin
+    ports:
+      - 8000:80
+    environment:
+      POSTFIXADMIN_DB_TYPE: mysqli
+      POSTFIXADMIN_DB_HOST: db
+      POSTFIXADMIN_DB_USER: postfixadmin
+      POSTFIXADMIN_DB_NAME: postfixadmin
+      POSTFIXADMIN_DB_PASSWORD: example
+    volumes:
+      - ./config/config.inc.php:/var/www/html/config.inc.php
+    restart: unless-stopped
+    container_name: postfixadmin
+ 
+  postfix:
+    image: catatnight/postfix
+    ports:
+      - "25:25"
+    environment:
+      - MAIL_DOMAIN=mail.teste.com
+      - MAIL_SERVER_HOSTNAME=mail.teste.com
